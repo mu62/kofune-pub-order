@@ -215,7 +215,7 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
       .filter(function (r) { return r && r.some(function (c) { return c !== "" && c != null; }); })
       .map(function (r) {
         var o = {};
-        head.forEach(function (k, i) { o[k] = r[i] == null ? "" : String(r[i]); });
+        head.forEach(function (k, i) { if (k === "note") return; o[k] = r[i] == null ? "" : String(r[i]); });
         return o;
       });
   }
@@ -237,7 +237,14 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
     return { S: S, B: B, cats: cats };
   }
 
-  var M = build(SNAP);
+  var DATA_URL = "https://script.google.com/macros/s/AKfycbxH4vXb6mRrSqTEB-GKg_AU7lrt1kaC5Ta50-3JEB8GHrxrQAggcrcjKaCWNP9_Jf2w/exec";
+  var CACHE_KEY = "kofune-menu-data-v1";
+  var M = null;
+  try {
+    var cachedRaw = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+    if (cachedRaw) { var cm = build(cachedRaw); if (cm.cats.length) M = cm; }
+  } catch (e) {}
+  if (!M) M = build(SNAP);
   var state = { tab: "drink", lang: "ja" };
   var I18N = {
     ja: { sold: "品切れ", more: "説明を読む", close: "閉じる", tap: "Tap No.", brewer: "Brewer:", prep: "メニューを準備中です", nav: "メニューの切り替え", cats: "カテゴリへ移動" },
@@ -497,6 +504,27 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
   state.tab = fromHash();
   renderAll();
   document.documentElement.style.setProperty("--hdr", $("top").offsetHeight + "px");
+
+  // ---- automatic update from the master spreadsheet (via the Apps Script data window) ----
+  // The page opens instantly with the last known menu, then swaps in the latest data if it differs.
+  (function autoLoad() {
+    var ctl = ("AbortController" in window) ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function () { ctl.abort(); }, 10000) : null;
+    fetch(DATA_URL, { credentials: "omit", cache: "no-store", signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { if (!r.ok) throw new Error("http"); return r.json(); })
+      .then(function (raw) {
+        if (!raw || !raw.categories || !raw.items) return;
+        var m = build(raw);
+        if (!m.cats.length) return;
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify(raw)); } catch (e) {}
+        if (JSON.stringify(m) === JSON.stringify(M)) return;
+        M = m;
+        renderAll();
+        document.documentElement.style.setProperty("--hdr", $("top").offsetHeight + "px");
+      })
+      .catch(function () {})
+      .then(function () { if (timer) clearTimeout(timer); });
+  })();
 
   // ---- optional live sync from the master spreadsheet (viewers with a Google Sheets connector) ----
   function syncMsg(t) { $("syncmsg").textContent = t; }
