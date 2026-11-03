@@ -266,11 +266,17 @@ h2::after { content: ""; flex: 1; height: 0.5pt; background: var(--ink); align-s
   (async function () {
     try {
       var dl = window.claude && window.claude.use ? await window.claude.use("downloads") : null;
-      if (!dl) return;
+      var plain = !dl;
+      if (plain) dl = { save: async function (o) { // normal browser: download the file directly
+        var blob = o.data instanceof Blob ? o.data : new Blob([o.data], { type: "text/html" });
+        var u = URL.createObjectURL(blob), a = document.createElement("a");
+        a.href = u; a.download = o.filename; document.body.append(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(u); }, 10000);
+      } };
       $("pdfbtn").hidden = false;
       $("pdfbtn").addEventListener("click", function () { makePdf(dl); });
       var btn = $("savebtn");
-      btn.hidden = false;
+      btn.hidden = plain;
       btn.addEventListener("click", async function () {
         var css = $("pcss").textContent;
         var html = '<!doctype html><html lang="' + state.lang + '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
