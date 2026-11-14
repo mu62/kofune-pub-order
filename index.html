@@ -149,9 +149,33 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
 .bandin { padding-block: 1.9rem; text-align: center; }
 .mark { font-family: var(--f-mark); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.26em; }
 
+/* announcements (from the sheet's settings: event_N_*) */
+.info { margin: 1.6rem auto 0; max-width: 34rem; border: 1px solid var(--ink); border-radius: 12px; overflow: hidden; display: block; }
+.info[hidden] { display: none; }
+.infohd { margin: 0; padding: 0.3rem 1.1rem; background: var(--ink); color: var(--paper); font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; }
+.ev { display: block; padding: 0.8rem 1.1rem; color: inherit; text-decoration: none; }
+.ev + .ev { border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+a.ev { -webkit-tap-highlight-color: transparent; }
+a.ev:hover { background: var(--tint); }
+.evdate { display: inline-block; margin-bottom: 0.2rem; padding: 0 0.6rem; border-radius: 999px; background: var(--red); color: #fff; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; }
+.evttl { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; font-size: 1.02rem; font-weight: 500; line-height: 1.5; }
+.evgo { flex: none; font-size: 0.8rem; font-weight: 400; color: var(--mute); white-space: nowrap; }
+.evbody { margin: 0.15rem 0 0; font-size: 0.9rem; line-height: 1.7; color: var(--mute); white-space: pre-line; }
+
+/* thank-you block: Instagram follow + Google Maps review */
+.thanks { margin: 3rem auto 0; max-width: 34rem; text-align: center; }
+.thanks h3 { margin: 0; font-size: 1.05rem; font-weight: 500; letter-spacing: 0.08em; }
+.thanks p { margin: 0.5rem 0 0; font-size: 0.88rem; color: var(--mute); line-height: 1.7; }
+.tbtns { margin-top: 1.1rem; display: grid; gap: 0.6rem; grid-template-columns: 1fr; }
+@media (min-width: 480px) { .tbtns { grid-template-columns: 1fr 1fr; } }
+.tbtn { display: flex; align-items: center; justify-content: center; gap: 0.55rem; padding: 0.7rem 1rem; border: 1px solid var(--ink); border-radius: 999px; background: var(--paper); color: var(--ink); font-size: 0.92rem; font-weight: 500; text-decoration: none; -webkit-tap-highlight-color: transparent; transition: background 0.18s, color 0.18s; }
+.tbtn.solid { background: var(--ink); color: var(--paper); }
+.tbtn:hover { background: var(--band); color: var(--ink); }
+.tbtn svg { flex: none; width: 1.15rem; height: 1.15rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .drop, .car, .tab, .cchip, .card, .dropin { transition: none; }
+  .drop, .car, .tab, .cchip, .card, .dropin, .tbtn { transition: none; }
 }
 </style>
 
@@ -172,12 +196,14 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
 </header>
 
 <div class="wrap">
+  <section class="info" id="info" aria-label="お知らせ" hidden></section>
   <div class="notice" id="notice" role="note"></div>
   <main id="menu" role="tabpanel" aria-labelledby="tab-drink"></main>
   <div class="syncrow" id="syncrow" hidden>
     <button id="syncbtn" type="button">最新データを読み込む</button>
     <p id="syncmsg" role="status"></p>
   </div>
+  <section class="thanks" id="thanks"></section>
 </div>
 <footer class="band"><div class="wrap bandin"><span class="mark" id="brand">KOFUNE SAKE BREWERY</span></div></footer>
 
@@ -247,8 +273,8 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
   if (!M) M = build(SNAP);
   var state = { tab: "drink", lang: "ja" };
   var I18N = {
-    ja: { sold: "品切れ", more: "説明を読む", close: "閉じる", tap: "Tap No.", brewer: "Brewer:", prep: "メニューを準備中です", nav: "メニューの切り替え", cats: "カテゴリへ移動" },
-    en: { sold: "Sold out", more: "Read more", close: "Close", tap: "Tap No.", brewer: "Brewer:", prep: "Menu coming soon", nav: "Switch menu", cats: "Jump to category" }
+    ja: { sold: "品切れ", more: "説明を読む", close: "閉じる", tap: "Tap No.", brewer: "Brewer:", prep: "メニューを準備中です", nav: "メニューの切り替え", cats: "カテゴリへ移動", info: "お知らせ", go: "詳しく ›", thx: "ご来店ありがとうございます", thxsub: "お楽しみいただけましたら、フォローや口コミでお知らせいただけるとうれしいです。", ig: "Instagramをフォロー", rv: "Googleマップで口コミを書く" },
+    en: { sold: "Sold out", more: "Read more", close: "Close", tap: "Tap No.", brewer: "Brewer:", prep: "Menu coming soon", nav: "Switch menu", cats: "Jump to category", info: "News", go: "Details ›", thx: "Thank you for visiting", thxsub: "If you enjoyed your time with us, we would love a follow or a review.", ig: "Follow on Instagram", rv: "Write a Google review" }
   };
   function L(k) { return I18N[state.lang][k]; }
   // Japanese is the master column; <key>_en holds the English text (falls back to Japanese when empty).
@@ -455,7 +481,62 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
     if (!cats.length) menu.append(h("p", { class: "notice" }, "メニューを準備中です"));
     setupChips(cats);
   }
-  function renderAll() { renderHead(); renderTabs(); renderMenu(); }
+  // ---- announcements + Instagram / Google review links ------------------------
+  // All content comes from the sheet's `settings` tab (staff edit the sheet only):
+  //   event_1..event_5 : _date (shown text) / _title / _body / _url (https only) / _end (YYYY/MM/DD, hidden after that day, JST) / *_en for English
+  //   info_title, instagram_url, review_url (the last two fall back to the defaults below)
+  var DEFAULT_IG = "https://www.instagram.com/kofune.sake/";
+  var DEFAULT_REVIEW = "https://search.google.com/local/writereview?placeid=ChIJ3Q_3lDLnAGARk_9d4DM2uYs";
+  function safeUrl(u, dflt) { u = (u || "").trim(); return /^https:\/\//i.test(u) ? u : (dflt || ""); }
+  function todayNum() {
+    var d = new Date(Date.now() + 9 * 3600 * 1000);
+    return d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate();
+  }
+  function renderInfo() {
+    var S = M.S, box = $("info"), today = todayNum(), evs = [];
+    box.textContent = "";
+    for (var n = 1; n <= 5; n++) {
+      var title = T(S, "event_" + n + "_title");
+      if (!title) continue;
+      var m = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(S["event_" + n + "_end"] || "");
+      if (m && (+m[1] * 10000 + +m[2] * 100 + +m[3]) < today) continue;
+      evs.push({ date: T(S, "event_" + n + "_date"), title: title, body: T(S, "event_" + n + "_body"), url: safeUrl(S["event_" + n + "_url"]) });
+    }
+    box.hidden = !evs.length;
+    if (!evs.length) return;
+    box.setAttribute("aria-label", T(S, "info_title") || L("info"));
+    box.append(h("p", { class: "infohd" }, T(S, "info_title") || L("info")));
+    evs.forEach(function (e) {
+      var inner = [
+        e.date ? h("span", { class: "evdate" }, e.date) : null,
+        h("div", { class: "evttl" }, h("span", null, e.title), e.url ? h("span", { class: "evgo" }, L("go")) : null),
+        e.body ? h("p", { class: "evbody" }, e.body) : null
+      ];
+      box.append(e.url
+        ? h.apply(null, ["a", { class: "ev", href: e.url, target: "_blank", rel: "noopener noreferrer" }].concat(inner))
+        : h.apply(null, ["div", { class: "ev" }].concat(inner)));
+    });
+  }
+  function renderThanks() {
+    var S = M.S, box = $("thanks");
+    var IG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6"/></svg>';
+    var ST = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6l2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8z"/></svg>';
+    function btn(cls, href, svg, label) {
+      var a = h("a", { class: "tbtn " + cls, href: href, target: "_blank", rel: "noopener noreferrer" });
+      a.innerHTML = svg;
+      a.append(label);
+      return a;
+    }
+    box.textContent = "";
+    box.append(
+      h("h3", null, L("thx")),
+      h("p", null, L("thxsub")),
+      h("div", { class: "tbtns" },
+        btn("", safeUrl(S.instagram_url, DEFAULT_IG), IG, L("ig")),
+        btn("solid", safeUrl(S.review_url, DEFAULT_REVIEW), ST, L("rv")))
+    );
+  }
+  function renderAll() { renderHead(); renderInfo(); renderTabs(); renderMenu(); renderThanks(); }
 
   // After switching tabs, bring the top of the list back under the sticky nav (only if scrolled past it).
   function toListTop() {
