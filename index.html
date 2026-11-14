@@ -150,9 +150,6 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
 .mark { font-family: var(--f-mark); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.26em; }
 
 /* announcements (from the sheet's settings: event_N_*) */
-.info { margin: 1.6rem auto 0; max-width: 34rem; border: 1px solid var(--ink); border-radius: 12px; overflow: hidden; display: block; }
-.info[hidden] { display: none; }
-.infohd { margin: 0; padding: 0.3rem 1.1rem; background: var(--ink); color: var(--paper); font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; }
 .ev { display: block; padding: 0.8rem 1.1rem; color: inherit; text-decoration: none; }
 .ev + .ev { border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
 a.ev { -webkit-tap-highlight-color: transparent; }
@@ -204,7 +201,6 @@ body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
 </header>
 
 <div class="wrap">
-  <section class="info" id="info" aria-label="お知らせ" hidden></section>
   <div class="notice" id="notice" role="note"></div>
   <main id="menu" role="tabpanel" aria-labelledby="tab-drink"></main>
   <div class="syncrow" id="syncrow" hidden>
@@ -522,15 +518,6 @@ body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
       ? h.apply(null, ["a", { class: "ev", href: e.url, target: "_blank", rel: "noopener noreferrer" }].concat(inner))
       : h.apply(null, ["div", { class: "ev" }].concat(inner));
   }
-  function renderInfo() {
-    var S = M.S, box = $("info"), evs = evList();
-    box.textContent = "";
-    box.hidden = !evs.length;
-    if (!evs.length) return;
-    box.setAttribute("aria-label", T(S, "info_title") || L("info"));
-    box.append(h("p", { class: "infohd" }, T(S, "info_title") || L("info")));
-    evs.forEach(function (e) { box.append(evNode(e)); });
-  }
   // News sheet opened from the fixed bar
   function openSheet() {
     var S = M.S, evs = evList();
@@ -573,7 +560,7 @@ body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
     ra.innerHTML = ST; ra.append(L("rv"));
     bar.append(ia, ra);
   }
-  function renderAll() { renderHead(); renderInfo(); renderTabs(); renderMenu(); renderBar(); }
+  function renderAll() { renderHead(); renderTabs(); renderMenu(); renderBar(); }
 
   // After switching tabs, bring the top of the list back under the sticky nav (only if scrolled past it).
   function toListTop() {
