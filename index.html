@@ -150,14 +150,20 @@ footer.band { margin-top: 3.5rem; background: var(--band); }
 .mark { font-family: var(--f-mark); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.26em; }
 
 /* announcements (from the sheet's settings: event_N_*) */
-.ev { display: block; padding: 0.8rem 1.1rem; color: inherit; text-decoration: none; }
-.ev + .ev { border-top: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
-a.ev { -webkit-tap-highlight-color: transparent; }
-a.ev:hover { background: var(--tint); }
-.evdate { display: inline-block; margin-bottom: 0.2rem; padding: 0 0.6rem; border-radius: 999px; background: var(--red); color: #fff; font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; }
-.evttl { display: flex; align-items: baseline; justify-content: space-between; gap: 0.8rem; font-size: 1.02rem; font-weight: 500; line-height: 1.5; }
-.evgo { flex: none; font-size: 0.8rem; font-weight: 400; color: var(--mute); white-space: nowrap; }
-.evbody { margin: 0.15rem 0 0; font-size: 0.9rem; line-height: 1.7; color: var(--mute); white-space: pre-line; }
+.ev { display: block; padding: 1.3rem 1.2rem 1.4rem; color: inherit; text-decoration: none; }
+.ev + .ev { border-top: 1px solid var(--rule); }
+.evtop { display: flex; gap: 0.95rem; align-items: stretch; }
+.evdt { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; min-width: 4.4rem; padding: 0.6rem 0.5rem; background: var(--ink); color: var(--paper); border-radius: 10px; }
+.evdt .m { font-size: 1.85rem; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.evdt .w { font-size: 0.78rem; letter-spacing: 0.2em; padding-left: 0.2em; line-height: 1; }
+.evmain { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.evmain .tag { align-self: flex-start; margin-bottom: 0.7rem; }
+.evttl { margin: 0; text-wrap: balance; word-break: keep-all; font-size: 1.4rem; font-weight: 700; line-height: 1.4; letter-spacing: 0.01em; overflow-wrap: anywhere; }
+.evtime { margin: 0.35rem 0 0; font-size: 0.9rem; font-weight: 500; color: var(--red); font-variant-numeric: tabular-nums; }
+.evdate { display: inline-block; margin-bottom: 0.4rem; padding: 0 0.7rem; border-radius: 999px; background: var(--red); color: #fff; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.04em; }
+.evbody { margin: 1rem 0 0; font-size: 1rem; line-height: 1.85; color: var(--ink); white-space: pre-line; }
+.evcta { margin-top: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; padding: 0.85rem 1rem; border-radius: 999px; background: var(--red); color: #fff; font-size: 1rem; font-weight: 700; letter-spacing: 0.04em; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.evcta:active { filter: brightness(0.9); }
 
 /* fixed bottom bar: News / Instagram / Google review */
 body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
@@ -168,6 +174,8 @@ body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
 .fbtn svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .fdot { position: absolute; top: 0.3rem; left: calc(50% + 0.45rem); width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--red); border: 1.5px solid var(--paper); }
 .fbar { max-width: 100%; }
+@keyframes fpulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.35); } }
+.fdot { animation: fpulse 1.6s ease-in-out infinite; }
 @media (min-width: 640px) { .fbar { padding-left: max(var(--gutter-l), calc((100% - 520px) / 2)); padding-right: max(var(--gutter-r), calc((100% - 520px) / 2)); } }
 
 .sheet { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; }
@@ -181,6 +189,7 @@ body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .drop, .car, .tab, .cchip, .card, .dropin { transition: none; }
+  .fdot { animation: none; }
 }
 </style>
 
@@ -278,7 +287,7 @@ body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
   if (!M) M = build(SNAP);
   var state = { tab: "drink", lang: "ja" };
   var I18N = {
-    ja: { sold: "品切れ", more: "説明を読む", close: "閉じる", tap: "Tap No.", brewer: "Brewer:", prep: "メニューを準備中です", nav: "メニューの切り替え", cats: "カテゴリへ移動", info: "お知らせ", go: "詳しく ›", ig: "Instagram", igl: "Instagramをフォロー", rv: "口コミを書く", rvl: "Googleマップで口コミを書く" },
+    ja: { sold: "品切れ", more: "説明を読む", close: "閉じる", tap: "Tap No.", brewer: "Brewer:", prep: "メニューを準備中です", nav: "メニューの切り替え", cats: "カテゴリへ移動", info: "お知らせ", go: "詳しく見る ›", ig: "Instagram", igl: "Instagramをフォロー", rv: "口コミを書く", rvl: "Googleマップで口コミを書く" },
     en: { sold: "Sold out", more: "Read more", close: "Close", tap: "Tap No.", brewer: "Brewer:", prep: "Menu coming soon", nav: "Switch menu", cats: "Jump to category", info: "News", go: "Details ›", ig: "Instagram", igl: "Follow on Instagram", rv: "Review", rvl: "Write a Google review" }
   };
   function L(k) { return I18N[state.lang][k]; }
@@ -504,19 +513,26 @@ body { padding-bottom: calc(4.6rem + env(safe-area-inset-bottom, 0px)); }
       if (!title) continue;
       var m = /(\d{4})\D+(\d{1,2})\D+(\d{1,2})/.exec(S["event_" + n + "_end"] || "");
       if (m && (+m[1] * 10000 + +m[2] * 100 + +m[3]) < today) continue;
-      evs.push({ date: T(S, "event_" + n + "_date"), title: title, body: T(S, "event_" + n + "_body"), url: safeUrl(S["event_" + n + "_url"]) });
+      evs.push({ date: T(S, "event_" + n + "_date"), dateJa: S["event_" + n + "_date"] || "", title: title, body: T(S, "event_" + n + "_body"), url: safeUrl(S["event_" + n + "_url"]), tag: T(S, "event_" + n + "_tag"), cta: T(S, "event_" + n + "_cta") });
     }
     return evs;
   }
+  var WEEK_EN = { "日": "Sun", "月": "Mon", "火": "Tue", "水": "Wed", "木": "Thu", "金": "Fri", "土": "Sat" };
   function evNode(e) {
-    var inner = [
-      e.date ? h("span", { class: "evdate" }, e.date) : null,
-      h("div", { class: "evttl" }, h("span", null, e.title), e.url ? h("span", { class: "evgo" }, L("go")) : null),
-      e.body ? h("p", { class: "evbody" }, e.body) : null
-    ];
-    return e.url
-      ? h.apply(null, ["a", { class: "ev", href: e.url, target: "_blank", rel: "noopener noreferrer" }].concat(inner))
-      : h.apply(null, ["div", { class: "ev" }].concat(inner));
+    // Big date block from "YYYY/M/D（曜）時刻": month/day numbers are language-neutral; falls back to a red pill.
+    var md = /(?:\d{4}\s*[\/年]\s*)?(\d{1,2})\s*[\/月]\s*(\d{1,2})/.exec(e.dateJa || "");
+    var wk = /[（(]\s*([日月火水木金土])/.exec(e.dateJa || "");
+    var block = null;
+    if (md) {
+      var w = wk ? (state.lang === "en" ? WEEK_EN[wk[1]] : wk[1]) : "";
+      block = h("div", { class: "evdt", "aria-hidden": "true" }, h("span", { class: "m" }, (+md[1]) + "/" + (+md[2])), w ? h("span", { class: "w" }, w) : null);
+    }
+    var tag = e.tag ? h("span", { class: "tag" }, e.tag) : null;
+    var main = h("div", { class: "evmain" }, tag, h("h3", { class: "evttl" }, e.title), (block && e.date) ? h("p", { class: "evtime" }, e.date) : null);
+    var top = h("div", { class: "evtop" }, block, main);
+    var kids = [(!block && e.date) ? h("span", { class: "evdate" }, e.date) : null, top, e.body ? h("p", { class: "evbody" }, e.body) : null];
+    if (e.url) kids.push(h("a", { class: "evcta", href: e.url, target: "_blank", rel: "noopener noreferrer" }, e.cta || L("go")));
+    return h.apply(null, ["div", { class: "ev" }].concat(kids));
   }
   // News sheet opened from the fixed bar
   function openSheet() {
